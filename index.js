@@ -3,12 +3,14 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const path = require('path');
+const fs = require('fs');
 
 const parseWorker = require('./workers/parser');
 const db = require('./db');
-const constants = require('./constants');
-const PORT = constants.PORT;
-const DB_URL = constants.DB_URL;
+const config = require('./config');
+const PORT = config.PORT;
+const DB_URL = config.DB_URL;
+const DATA_FILE_PATH = config.DATA_FILE_PATH;
 
 const index = require('./routes/index');
 
@@ -32,6 +34,10 @@ app.get('/stop', function (req, res) {
   const stopped = parseWorker.stop();
   if (stopped) return res.send('stopped!');
   res.send('some error occured when stopping :(');
+});
+app.get('/data', function (req, res) {
+  if (fs.existsSync(DATA_FILE_PATH)) return res.sendFile(DATA_FILE_PATH);
+  return res.send(404);
 });
 
 db.connect(DB_URL, function (err) {

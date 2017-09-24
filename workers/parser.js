@@ -2,7 +2,9 @@ const fetch = require('isomorphic-fetch');
 const jsonfile = require('jsonfile');
 const path = require('path');
 
-const filePath = path.join(__dirname, '..', 'data.json');
+const config = require('../config');
+const DATA_FILE_PATH = config.DATA_FILE_PATH;
+const PARSE_INTERVAL = config.PARSE_INTERVAL;
 
 const url = 'https://1xstavka.ru/LineFeed/Get1x2_Zip?' +
   'sports=4&' +
@@ -24,10 +26,10 @@ function parse(inputUrl) {
     fetch(inputUrl || url)
     .then(function (res) { return res.json() })
     .then(function (json) {
-      jsonfile.writeFileSync(filePath, json);
+      jsonfile.writeFileSync(DATA_FILE_PATH, json);
       return json;
     }).catch(function () {});
-  }, 10000);
+  }, PARSE_INTERVAL);
   return !!state.interval;
 }
 
