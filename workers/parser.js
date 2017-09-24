@@ -19,17 +19,20 @@ const state = {
   interval: null
 };
 
-function parse(inputUrl) {
+function parseAndWriteToFile() {
+  fetch(url)
+  .then(function (res) { return res.json() })
+  .then(function (json) {
+    jsonfile.writeFileSync(DATA_FILE_PATH, json);
+    return json;
+  }).catch(function () {});
+}
+
+function parse() {
   if (state.interval) clearInterval(state.interval);
-  if (!inputUrl && !url) return false;
-  state.interval = setInterval(function () {
-    fetch(inputUrl || url)
-    .then(function (res) { return res.json() })
-    .then(function (json) {
-      jsonfile.writeFileSync(DATA_FILE_PATH, json);
-      return json;
-    }).catch(function () {});
-  }, PARSE_INTERVAL);
+  if (!url) return false;
+  parseAndWriteToFile();
+  state.interval = setInterval(parseAndWriteToFile, PARSE_INTERVAL);
   return !!state.interval;
 }
 
